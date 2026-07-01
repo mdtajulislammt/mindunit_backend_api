@@ -1,0 +1,160 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// User Model
+model User {
+  id               String          @id @default(uuid())
+  firstName        String          @map("first_name")
+  lastName         String          @map("last_name")
+  email            String          @unique
+  passwordHash     String          @map("password_hash")
+  headline         String          @default("Brain Health Enthusiast | MindUnite Member")
+  avatarUrl        String?         @map("avatar_url")
+  connectionsCount Int             @default(0) @map("connections_count")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  
+  // Relations
+  posts            Post[]
+  comments         Comment[]
+  replies          Reply[]
+  postLikes        PostLike[]
+  commentLikes     CommentLike[]
+  replyLikes       ReplyLike[]
+  groupMembers     GroupMember[]
+
+  @@map("users")
+}
+
+// Post Model
+model Post {
+  id        String     @id @default(uuid())
+  content   String     @db.Text
+  imageUrl  String?    @map("image_url")
+  privacy   Privacy    @default(PUBLIC)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  
+  // Author
+  authorId  String     @map("author_id")
+  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  likes     PostLike[]
+  comments  Comment[]
+
+  @@map("posts")
+}
+
+enum Privacy {
+  PUBLIC
+  PRIVATE
+}
+
+// Post Likes
+model PostLike {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([postId, userId]) // Prevents duplicate likes
+  @@map("post_likes")
+}
+
+// Comment Model
+model Comment {
+  id        String        @id @default(uuid())
+  content   String        @db.Text
+  createdAt DateTime      @default(now()) @map("created_at")
+  
+  postId    String        @map("post_id")
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String        @map("author_id")
+  author    User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  likes     CommentLike[]
+  replies   Reply[]
+
+  @@map("comments")
+}
+
+// Comment Likes
+model CommentLike {
+  id        String   @id @default(uuid())
+  commentId String   @map("comment_id")
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([commentId, userId])
+  @@map("comment_likes")
+}
+
+// Nested Reply Model
+model Reply {
+  id        String      @id @default(uuid())
+  content   String      @db.Text
+  createdAt DateTime    @default(now()) @map("created_at")
+  
+  commentId String      @map("comment_id")
+  comment   Comment     @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  authorId  String      @map("author_id")
+  author    User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  likes     ReplyLike[]
+
+  @@map("replies")
+}
+
+// Reply Likes
+model ReplyLike {
+  id        String   @id @default(uuid())
+  replyId   String   @map("reply_id")
+  reply     Reply    @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([replyId, userId])
+  @@map("reply_likes")
+}
+
+// Group Model
+model Group {
+  id           String        @id @default(uuid())
+  name         String
+  category     String
+  avatarUrl    String        @map("avatar_url")
+  membersCount Int           @default(0) @map("members_count")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  
+  // Relations
+  members      GroupMember[]
+
+  @@map("groups")
+}
+
+// Group Membership
+model GroupMember {
+  id       String   @id @default(uuid())
+  groupId  String   @map("group_id")
+  group    Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId   String   @map("user_id")
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt DateTime @default(now()) @map("joined_at")
+
+  @@unique([groupId, userId])
+  @@map("group_members")
+}
