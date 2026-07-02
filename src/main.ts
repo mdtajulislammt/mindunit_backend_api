@@ -15,7 +15,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   // Serve local uploaded files statically (fallback upload path)
-  app.useStaticAssets(join(__dirname, '..', 'public'), {
+  app.useStaticAssets(join(process.cwd(), 'public'), {
     prefix: '/public/',
   });
 

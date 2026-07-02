@@ -146,6 +146,128 @@ let PostService = class PostService {
             })),
         }));
     }
+    async update(postId, updatePostDto, authorId) {
+        const post = await this.prisma.post.findUnique({
+            where: { id: postId },
+        });
+        if (!post) {
+            throw new common_1.NotFoundException('Post not found');
+        }
+        if (post.authorId !== authorId) {
+            throw new common_1.ForbiddenException('You can only edit your own posts');
+        }
+        const data = {};
+        if (updatePostDto.content !== undefined)
+            data.content = updatePostDto.content;
+        if (updatePostDto.imageUrl !== undefined)
+            data.imageUrl = updatePostDto.imageUrl;
+        if (updatePostDto.privacy !== undefined) {
+            data.privacy = updatePostDto.privacy.toUpperCase();
+        }
+        const updatedPost = await this.prisma.post.update({
+            where: { id: postId },
+            data,
+            include: {
+                author: true,
+                likes: {
+                    select: {
+                        userId: true,
+                    },
+                },
+                comments: {
+                    include: {
+                        author: true,
+                        likes: {
+                            select: {
+                                userId: true,
+                            },
+                        },
+                        replies: {
+                            include: {
+                                author: true,
+                                likes: {
+                                    select: {
+                                        userId: true,
+                                    },
+                                },
+                            },
+                            orderBy: {
+                                createdAt: 'asc',
+                            },
+                        },
+                    },
+                    orderBy: {
+                        createdAt: 'asc',
+                    },
+                },
+            },
+        });
+        return {
+            id: updatedPost.id,
+            content: updatedPost.content,
+            imageUrl: updatedPost.imageUrl,
+            privacy: updatedPost.privacy.toLowerCase(),
+            createdAt: updatedPost.createdAt.toISOString(),
+            author: {
+                id: updatedPost.author.id,
+                firstName: updatedPost.author.firstName,
+                lastName: updatedPost.author.lastName,
+                email: updatedPost.author.email,
+                headline: updatedPost.author.headline,
+                avatarUrl: updatedPost.author.avatarUrl,
+                connectionsCount: updatedPost.author.connectionsCount,
+            },
+            likes: updatedPost.likes.map((l) => l.userId),
+            comments: updatedPost.comments.map((c) => ({
+                id: c.id,
+                content: c.content,
+                createdAt: c.createdAt.toISOString(),
+                author: {
+                    id: c.author.id,
+                    firstName: c.author.firstName,
+                    lastName: c.author.lastName,
+                    email: c.author.email,
+                    headline: c.author.headline,
+                    avatarUrl: c.author.avatarUrl,
+                    connectionsCount: c.author.connectionsCount,
+                },
+                likes: c.likes.map((l) => l.userId),
+                replies: c.replies.map((r) => ({
+                    id: r.id,
+                    content: r.content,
+                    createdAt: r.createdAt.toISOString(),
+                    author: {
+                        id: r.author.id,
+                        firstName: r.author.firstName,
+                        lastName: r.author.lastName,
+                        email: r.author.email,
+                        headline: r.author.headline,
+                        avatarUrl: r.author.avatarUrl,
+                        connectionsCount: r.author.connectionsCount,
+                    },
+                    likes: r.likes.map((l) => l.userId),
+                })),
+            })),
+        };
+    }
+    async delete(postId, authorId) {
+        const post = await this.prisma.post.findUnique({
+            where: { id: postId },
+        });
+        if (!post) {
+            throw new common_1.NotFoundException('Post not found');
+        }
+        if (post.authorId !== authorId) {
+            throw new common_1.ForbiddenException('You can only delete your own posts');
+        }
+        await this.prisma.post.delete({
+            where: { id: postId },
+        });
+        return {
+            success: true,
+            message: 'Post successfully deleted',
+        };
+    }
 };
 exports.PostService = PostService;
 exports.PostService = PostService = __decorate([

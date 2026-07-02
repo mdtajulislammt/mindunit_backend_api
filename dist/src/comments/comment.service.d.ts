@@ -33,4 +33,12 @@ export declare class CommentService {
         };
         likes: never[];
     }>;
+    deleteComment(commentId: string, authorId: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
+    deleteReply(replyId: string, authorId: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
 }

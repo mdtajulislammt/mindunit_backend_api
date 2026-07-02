@@ -18,6 +18,7 @@ const platform_express_1 = require("@nestjs/platform-express");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const post_service_1 = require("./post.service");
 const create_post_dto_1 = require("./dto/create-post.dto");
+const update_post_dto_1 = require("./dto/update-post.dto");
 const comment_service_1 = require("../comments/comment.service");
 const create_comment_dto_1 = require("../comments/dto/create-comment.dto");
 const swagger_1 = require("@nestjs/swagger");
@@ -46,6 +47,16 @@ let PostController = class PostController {
     }
     async createReply(postId, commentId, createCommentDto, req) {
         return this.commentService.createReply(commentId, req.user.id, createCommentDto.content);
+    }
+    async update(postId, updatePostDto, file, req) {
+        let imageUrl = updatePostDto.imageUrl;
+        if (file) {
+            imageUrl = await this.uploadService.uploadFile(file);
+        }
+        return this.postService.update(postId, { ...updatePostDto, imageUrl }, req.user.id);
+    }
+    async delete(postId, req) {
+        return this.postService.delete(postId, req.user.id);
     }
 };
 exports.PostController = PostController;
@@ -115,6 +126,50 @@ __decorate([
     __metadata("design:paramtypes", [String, String, create_comment_dto_1.CreateCommentDto, Object]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "createReply", null);
+__decorate([
+    (0, common_1.Put)(':id'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image')),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                content: { type: 'string', description: 'Updated post text content' },
+                privacy: { type: 'string', enum: ['public', 'private'], description: 'Updated post privacy setting' },
+                image: {
+                    type: 'string',
+                    format: 'binary',
+                    description: 'New image file to upload (optional)',
+                },
+            },
+        },
+    }),
+    (0, swagger_1.ApiOperation)({ summary: 'Update/Edit an existing post' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Post successfully updated.' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized.' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden (not the author).' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Post not found.' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.UploadedFile)()),
+    __param(3, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_post_dto_1.UpdatePostDto, Object, Object]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a post' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Post successfully deleted.' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized.' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden (not the author).' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Post not found.' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "delete", null);
 exports.PostController = PostController = __decorate([
     (0, swagger_1.ApiTags)('Posts & News Feed'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),

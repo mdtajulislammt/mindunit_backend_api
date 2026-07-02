@@ -1,9 +1,10 @@
 /// <reference types="multer" />
-import { Controller, Post, Get, Body, UseGuards, Request, Param, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Body, UseGuards, Request, Param, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 import { CommentService } from '../comments/comment.service';
 import { CreateCommentDto } from '../comments/dto/create-comment.dto';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
@@ -86,5 +87,50 @@ export class PostController {
     @Request() req,
   ) {
     return this.commentService.createReply(commentId, req.user.id, createCommentDto.content);
+  }
+
+  @Put(':id')
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        content: { type: 'string', description: 'Updated post text content' },
+        privacy: { type: 'string', enum: ['public', 'private'], description: 'Updated post privacy setting' },
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: 'New image file to upload (optional)',
+        },
+      },
+    },
+  })
+  @ApiOperation({ summary: 'Update/Edit an existing post' })
+  @ApiResponse({ status: 200, description: 'Post successfully updated.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden (not the author).' })
+  @ApiResponse({ status: 404, description: 'Post not found.' })
+  async update(
+    @Param('id') postId: string,
+    @Body() updatePostDto: UpdatePostDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req,
+  ) {
+    let imageUrl = updatePostDto.imageUrl;
+    if (file) {
+      imageUrl = await this.uploadService.uploadFile(file);
+    }
+    return this.postService.update(postId, { ...updatePostDto, imageUrl }, req.user.id);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a post' })
+  @ApiResponse({ status: 200, description: 'Post successfully deleted.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden (not the author).' })
+  @ApiResponse({ status: 404, description: 'Post not found.' })
+  async delete(@Param('id') postId: string, @Request() req) {
+    return this.postService.delete(postId, req.user.id);
   }
 }

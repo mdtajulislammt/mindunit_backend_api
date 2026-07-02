@@ -84,6 +84,42 @@ let CommentService = class CommentService {
             likes: [],
         };
     }
+    async deleteComment(commentId, authorId) {
+        const comment = await this.prisma.comment.findUnique({
+            where: { id: commentId },
+        });
+        if (!comment) {
+            throw new common_1.NotFoundException('Comment not found');
+        }
+        if (comment.authorId !== authorId) {
+            throw new common_1.ForbiddenException('You can only delete your own comments');
+        }
+        await this.prisma.comment.delete({
+            where: { id: commentId },
+        });
+        return {
+            success: true,
+            message: 'Comment successfully deleted',
+        };
+    }
+    async deleteReply(replyId, authorId) {
+        const reply = await this.prisma.reply.findUnique({
+            where: { id: replyId },
+        });
+        if (!reply) {
+            throw new common_1.NotFoundException('Reply not found');
+        }
+        if (reply.authorId !== authorId) {
+            throw new common_1.ForbiddenException('You can only delete your own replies');
+        }
+        await this.prisma.reply.delete({
+            where: { id: replyId },
+        });
+        return {
+            success: true,
+            message: 'Reply successfully deleted',
+        };
+    }
 };
 exports.CommentService = CommentService;
 exports.CommentService = CommentService = __decorate([

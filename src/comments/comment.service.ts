@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -77,6 +77,52 @@ export class CommentService {
         connectionsCount: reply.author.connectionsCount,
       },
       likes: [],
+    };
+  }
+
+  async deleteComment(commentId: string, authorId: string) {
+    const comment = await this.prisma.comment.findUnique({
+      where: { id: commentId },
+    });
+
+    if (!comment) {
+      throw new NotFoundException('Comment not found');
+    }
+
+    if (comment.authorId !== authorId) {
+      throw new ForbiddenException('You can only delete your own comments');
+    }
+
+    await this.prisma.comment.delete({
+      where: { id: commentId },
+    });
+
+    return {
+      success: true,
+      message: 'Comment successfully deleted',
+    };
+  }
+
+  async deleteReply(replyId: string, authorId: string) {
+    const reply = await this.prisma.reply.findUnique({
+      where: { id: replyId },
+    });
+
+    if (!reply) {
+      throw new NotFoundException('Reply not found');
+    }
+
+    if (reply.authorId !== authorId) {
+      throw new ForbiddenException('You can only delete your own replies');
+    }
+
+    await this.prisma.reply.delete({
+      where: { id: replyId },
+    });
+
+    return {
+      success: true,
+      message: 'Reply successfully deleted',
     };
   }
 }
