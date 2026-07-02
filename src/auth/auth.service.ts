@@ -1,4 +1,9 @@
-import { Injectable, ConflictException, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
@@ -117,13 +122,17 @@ export class AuthService {
         <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
         <p style="font-size: 12px; color: #999; text-align: center;">MindUnite Platform &copy; 2026</p>
       </div>
-      `
+      `,
     );
 
-    console.log(`\n==================================================\n[DEVELOPMENT] Verification Code for ${email} is: ${code}\n==================================================\n`);
+    console.log(
+      `\n==================================================\n[DEVELOPMENT] Verification Code for ${email} is: ${code}\n==================================================\n`,
+    );
 
     if (!mailSent) {
-      console.warn(`[WARNING] Failed to send verification email via SMTP, falling back to simulation.`);
+      console.warn(
+        `[WARNING] Failed to send verification email via SMTP, falling back to simulation.`,
+      );
     }
 
     return {

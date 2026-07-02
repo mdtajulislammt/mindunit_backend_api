@@ -130,7 +130,7 @@ let AuthService = class AuthService {
         <p style="font-size: 12px; color: #999; text-align: center;">MindUnite Platform &copy; 2026</p>
       </div>
       `);
-        console.log(...oo_oo(`992278051_123_4_123_183_4`, `\n==================================================\n[DEVELOPMENT] Verification Code for ${email} is: ${code}\n==================================================\n`));
+        console.log(...oo_oo(`3244116564_128_4_130_5_4`, `\n==================================================\n[DEVELOPMENT] Verification Code for ${email} is: ${code}\n==================================================\n`));
         if (!mailSent) {
             console.warn(`[WARNING] Failed to send verification email via SMTP, falling back to simulation.`);
         }
