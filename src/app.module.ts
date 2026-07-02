@@ -9,6 +9,7 @@ import { CommentModule } from './comments/comment.module';
 import { LikeModule } from './likes/like.module';
 import { GroupModule } from './groups/group.module';
 import { UploadModule } from './upload/upload.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UploadModule } from './upload/upload.module';
     LikeModule,
     GroupModule,
     UploadModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

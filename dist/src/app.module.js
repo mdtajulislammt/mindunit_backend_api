@@ -18,6 +18,7 @@ const comment_module_1 = require("./comments/comment.module");
 const like_module_1 = require("./likes/like.module");
 const group_module_1 = require("./groups/group.module");
 const upload_module_1 = require("./upload/upload.module");
+const mail_module_1 = require("./mail/mail.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -32,6 +33,7 @@ exports.AppModule = AppModule = __decorate([
             like_module_1.LikeModule,
             group_module_1.GroupModule,
             upload_module_1.UploadModule,
+            mail_module_1.MailModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
