@@ -11,9 +11,9 @@ export declare class AuthService {
     register(registerDto: RegisterDto): Promise<{
         user: {
             id: string;
-            email: string;
             firstName: string;
             lastName: string;
+            email: string;
             headline: string;
             avatarUrl: string | null;
             connectionsCount: number;
@@ -28,9 +28,9 @@ export declare class AuthService {
     login(loginDto: LoginDto): Promise<{
         user: {
             id: string;
-            email: string;
             firstName: string;
             lastName: string;
+            email: string;
             headline: string;
             avatarUrl: string | null;
             connectionsCount: number;
