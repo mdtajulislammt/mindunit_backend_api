@@ -27,7 +27,7 @@ export declare class PostController {
         likes: never[];
         comments: never[];
     }>;
-    getFeed(req: any): Promise<{
+    getFeed(req: any, limit?: string, cursor?: string): Promise<{
         id: string;
         content: string;
         imageUrl: string | null;

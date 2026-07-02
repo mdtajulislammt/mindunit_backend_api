@@ -39,8 +39,9 @@ let PostController = class PostController {
         }
         return this.postService.create({ ...createPostDto, imageUrl }, req.user.id);
     }
-    async getFeed(req) {
-        return this.postService.getFeed(req.user.id);
+    async getFeed(req, limit, cursor) {
+        const parsedLimit = limit ? parseInt(limit, 10) : 10;
+        return this.postService.getFeed(req.user.id, parsedLimit, cursor);
     }
     async createComment(postId, createCommentDto, req) {
         return this.commentService.createComment(postId, req.user.id, createCommentDto.content);
@@ -91,12 +92,14 @@ __decorate([
 ], PostController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Retrieve news feed (public posts + own private posts)' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Retrieve news feed (public posts + own private posts) with cursor-based pagination' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Feed successfully fetched.' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized.' }),
     __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('limit')),
+    __param(2, (0, common_1.Query)('cursor')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, String, String]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "getFeed", null);
 __decorate([

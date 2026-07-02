@@ -44,8 +44,11 @@ export class PostService {
     };
   }
 
-  async getFeed(currentUserId: string) {
+  async getFeed(currentUserId: string, limit = 10, cursor?: string) {
     const posts = await this.prisma.post.findMany({
+      take: limit,
+      skip: cursor ? 1 : undefined,
+      cursor: cursor ? { id: cursor } : undefined,
       where: {
         OR: [
           { privacy: Privacy.PUBLIC },

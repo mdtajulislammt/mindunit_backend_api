@@ -49,6 +49,8 @@ model Post {
   likes     PostLike[]
   comments  Comment[]
 
+  @@index([createdAt])
+  @@index([authorId])
   @@map("posts")
 }
 
@@ -85,6 +87,8 @@ model Comment {
   likes     CommentLike[]
   replies   Reply[]
 
+  @@index([postId])
+  @@index([createdAt])
   @@map("comments")
 }
 
@@ -115,6 +119,8 @@ model Reply {
   // Relations
   likes     ReplyLike[]
 
+  @@index([commentId])
+  @@index([createdAt])
   @@map("replies")
 }
 
@@ -156,5 +162,6 @@ model GroupMember {
   joinedAt DateTime @default(now()) @map("joined_at")
 
   @@unique([groupId, userId])
+  @@index([userId])
   @@map("group_members")
 }

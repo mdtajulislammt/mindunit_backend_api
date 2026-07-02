@@ -52,8 +52,11 @@ let PostService = class PostService {
             comments: [],
         };
     }
-    async getFeed(currentUserId) {
+    async getFeed(currentUserId, limit = 10, cursor) {
         const posts = await this.prisma.post.findMany({
+            take: limit,
+            skip: cursor ? 1 : undefined,
+            cursor: cursor ? { id: cursor } : undefined,
             where: {
                 OR: [
                     { privacy: client_1.Privacy.PUBLIC },

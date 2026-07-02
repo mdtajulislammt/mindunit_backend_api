@@ -169,9 +169,12 @@ This document describes the request/response payloads for integrating the fronte
 
 ## 3. Posts & News Feed Module (`/posts`)
 
-### Retrieve News Feed
-* **Method & Path**: `GET /api/posts`
+### Retrieve News Feed (Supports Cursor-based Pagination)
+* **Method & Path**: `GET /api/posts?limit=10&cursor=<last_post_id>`
 * **Request Header**: `Authorization: Bearer <JWT_TOKEN>`
+* **Query Parameters**:
+  - `limit`: Number of posts to fetch (Optional, defaults to 10)
+  - `cursor`: The ID of the last post returned in the previous page (Optional, to fetch subsequent pages)
 * **Response Body (200 OK)**:
 ```json
 [

@@ -1,5 +1,5 @@
 /// <reference types="multer" />
-import { Controller, Post, Get, Put, Delete, Body, UseGuards, Request, Param, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Body, UseGuards, Request, Param, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PostService } from './post.service';
@@ -55,11 +55,16 @@ export class PostController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Retrieve news feed (public posts + own private posts)' })
+  @ApiOperation({ summary: 'Retrieve news feed (public posts + own private posts) with cursor-based pagination' })
   @ApiResponse({ status: 200, description: 'Feed successfully fetched.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  async getFeed(@Request() req) {
-    return this.postService.getFeed(req.user.id);
+  async getFeed(
+    @Request() req,
+    @Query('limit') limit?: string,
+    @Query('cursor') cursor?: string,
+  ) {
+    const parsedLimit = limit ? parseInt(limit, 10) : 10;
+    return this.postService.getFeed(req.user.id, parsedLimit, cursor);
   }
 
   @Post(':id/comments')

@@ -21,7 +21,7 @@ export declare class PostService {
         likes: never[];
         comments: never[];
     }>;
-    getFeed(currentUserId: string): Promise<{
+    getFeed(currentUserId: string, limit?: number, cursor?: string): Promise<{
         id: string;
         content: string;
         imageUrl: string | null;
