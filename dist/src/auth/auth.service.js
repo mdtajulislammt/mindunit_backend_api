@@ -48,6 +48,7 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcrypt"));
 const mail_service_1 = require("../mail/mail.service");
+const verification_code_template_1 = require("../mail/templates/verification-code.template");
 let AuthService = class AuthService {
     prisma;
     jwtService;
@@ -117,20 +118,8 @@ let AuthService = class AuthService {
                 expiresAt,
             },
         });
-        const mailSent = await this.mailService.sendMail(email, 'Your MindUnite Verification Code', `Your verification code is: ${code}. It will expire in 10 minutes.`, `
-      <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 8px; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #4f46e5; margin-bottom: 20px;">MindUnite Verification Code</h2>
-        <p style="font-size: 16px; color: #333;">Hello,</p>
-        <p style="font-size: 16px; color: #333;">Your verification OTP code is:</p>
-        <div style="font-size: 32px; font-weight: bold; letter-spacing: 4px; color: #4f46e5; padding: 15px 0; text-align: center; background-color: #f5f3ff; border-radius: 6px; margin: 20px 0;">
-          ${code}
-        </div>
-        <p style="font-size: 14px; color: #666; margin-top: 20px;">This code is valid for 10 minutes. If you did not request this, you can ignore this email.</p>
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
-        <p style="font-size: 12px; color: #999; text-align: center;">MindUnite Platform &copy; 2026</p>
-      </div>
-      `);
-        console.log(...oo_oo(`3244116564_128_4_130_5_4`, `\n==================================================\n[DEVELOPMENT] Verification Code for ${email} is: ${code}\n==================================================\n`));
+        const mailSent = await this.mailService.sendMail(email, 'Your MindUnite Verification Code', `Your verification code is: ${code}. It will expire in 10 minutes.`, (0, verification_code_template_1.verificationCodeTemplate)(code));
+        console.log(...oo_oo(`22980596_117_4_119_5_4`, `\n==================================================\n[DEVELOPMENT] Verification Code for ${email} is: ${code}\n==================================================\n`));
         if (!mailSent) {
             console.warn(`[WARNING] Failed to send verification email via SMTP, falling back to simulation.`);
         }
