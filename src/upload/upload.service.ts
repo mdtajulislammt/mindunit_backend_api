@@ -63,7 +63,6 @@ export class UploadService {
     await fs.promises.writeFile(filePath, file.buffer);
     this.logger.log(`File saved locally: ${filePath}`);
 
-    const port = process.env.PORT || 5001;
-    return `http://localhost:${port}/public/uploads/${uniqueFilename}`;
+    return `https://unit-backend.pixelstack.cloud/api/public/uploads/${uniqueFilename}`;
   }
 }
