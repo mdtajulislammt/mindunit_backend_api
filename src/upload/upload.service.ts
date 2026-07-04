@@ -23,7 +23,9 @@ export class UploadService {
       this.useCloudinary = true;
       this.logger.log('Cloudinary successfully configured.');
     } else {
-      this.logger.warn('Cloudinary credentials missing in .env. Falling back to local storage uploader.');
+      this.logger.warn(
+        'Cloudinary credentials missing in .env. Falling back to local storage uploader.',
+      );
     }
   }
 
@@ -36,12 +38,15 @@ export class UploadService {
           },
           (error, result) => {
             if (error || !result) {
-              this.logger.error('Cloudinary upload failed, falling back to local storage uploader:', error);
+              this.logger.error(
+                'Cloudinary upload failed, falling back to local storage uploader:',
+                error,
+              );
               resolve(this.uploadLocal(file));
             } else {
               resolve(result.secure_url);
             }
-          }
+          },
         );
         uploadStream.end(file.buffer);
       });
@@ -63,6 +68,6 @@ export class UploadService {
     await fs.promises.writeFile(filePath, file.buffer);
     this.logger.log(`File saved locally: ${filePath}`);
 
-    return `https://unit-backend.pixelstack.cloud/api/public/uploads/${uniqueFilename}`;
+    return `https://unit-backend.pixelstack.cloud/public/uploads/${uniqueFilename}`;
   }
 }
